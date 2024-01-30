@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "ordereddictionary",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lukaskubanek/OrderedDictionary.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "06fd5ea31a9888769b3bae03e4d134da1cf69c50"
+      }
+    }
+  ],
+  "version" : 2
+}
