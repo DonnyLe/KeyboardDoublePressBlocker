@@ -6,15 +6,30 @@
 //
 
 import SwiftUI
+import Cocoa
 
 @main
 struct debounceApp: App {
-    @StateObject var model: Model = Model();
+
+    
+    
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject var viewModel: ViewModel = ViewModel();
+
+
+    
+    
+
     var body: some Scene {
         WindowGroup {
-            ContentView().environmentObject(model)
+            ContentView(appDel: appDelegate).environmentObject(viewModel)
+            }
+        
+          
         }
+        
     }
-}
+    
+
 
 

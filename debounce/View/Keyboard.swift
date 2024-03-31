@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct Keyboard: View {
-    @EnvironmentObject var model: Model;
+    @EnvironmentObject var viewModel: ViewModel;
     @State var color: Color =  Color(red: 0, green: 0, blue: 0)
     var body: some View {
         VStack{
-            ForEach (0..<model.allKeys.endIndex, id:\.self) { index in
+            ForEach (0..<viewModel.allKeys.endIndex, id:\.self) { index in
                 HStack {
-                    ForEach(Array(model.allKeys[index].orderedValues)) { key in
+                    ForEach(viewModel.allKeys[index].orderedValues) { key in
                         Text(key.keyName)
                             .padding(20)
                             .overlay(RoundedRectangle(cornerRadius: 10.0).strokeBorder(Color.white, style: StrokeStyle(lineWidth: 1.0)).fill(color.changeKeyColor(percentage:                         key.getPercentageOfDoublePress())))

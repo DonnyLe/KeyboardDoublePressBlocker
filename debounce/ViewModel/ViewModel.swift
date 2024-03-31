@@ -13,12 +13,16 @@
 //https://stackoverflow.com/questions/40144259/modify-accessibility-settings-on-macos-with-swift
 import OrderedDictionary
 import SwiftUI
+import Cocoa
 
-class Model : ObservableObject {
-    
+class ViewModel : ObservableObject {
     @Published var allKeys: [OrderedDictionary<Int, Keys>];
+    var appDelegate: AppDelegate?;
+    var keyboardId: Int?
+    var updatedKb: Bool
     
     init() {
+        updatedKb = false
         allKeys = [ [53: Keys("esc"),
                     160: Keys("F3"),
                     177: Keys("F4"),
@@ -83,13 +87,15 @@ class Model : ObservableObject {
     }
     
     
-    func start (){
+    func start (appDelegate: AppDelegate){
+        self.appDelegate = appDelegate
+        appDelegate.addViewModelObserver(viewModel: self)
         //callback function for key presses
         let callBackPress: CGEventTapCallBack = { (proxy, type, event, refcon: UnsafeMutableRawPointer?) in
             //to avoid "A C function pointer cannot be formed from a closure that captures context", callback function
             //is a C function, cannot use 'self'. Must have a self pointer to Logic class
             if let ptr = refcon {
-                let listener = Unmanaged<Model>.fromOpaque(ptr).takeUnretainedValue()
+                let listener = Unmanaged<ViewModel>.fromOpaque(ptr).takeUnretainedValue()
                 print("Key Press: \(event.getIntegerValueField(CGEventField.keyboardEventKeycode)), Event TimeStamp: \(Double(event.timestamp) * pow(10, -9))");
                 let keyCode: Int = Int(truncatingIfNeeded: event.getIntegerValueField(CGEventField.keyboardEventKeycode))
                 var key: Keys?;
@@ -118,9 +124,9 @@ class Model : ObservableObject {
         //callback function for key releases
         let callBackRelease: CGEventTapCallBack = { (proxy, type, event, refcon: UnsafeMutableRawPointer?) in
             //to avoid "A C function pointer cannot be formed from a closure that captures context", callback function
-            //is a C function, cannot use 'self'. Must have a self pointer to Logic class
+            //is a C function, cannot use 'self'. Must have a self pointer to Model class
             if let ptr = refcon {
-                let listener = Unmanaged<Model>.fromOpaque(ptr).takeUnretainedValue()
+                let listener = Unmanaged<ViewModel>.fromOpaque(ptr).takeUnretainedValue()
                 print("Key Release: \(event.getIntegerValueField(CGEventField.keyboardEventKeycode)), Event TimeStamp: \(Double(event.timestamp) * pow(10, -9))");
                 let keyCode: Int = Int(truncatingIfNeeded: event.getIntegerValueField(CGEventField.keyboardEventKeycode))
                 var key: Keys?;
@@ -133,7 +139,22 @@ class Model : ObservableObject {
                         key = nil;
                     }
                 }
-                var test: CGEventSourceKeyboardType = CGEventSource(event: event)!.keyboardType
+                var keyboardId: CGEventSourceKeyboardType = CGEventSource(event: event)!.keyboardType
+                let swiftInstance = Unmanaged<ViewModel>.fromOpaque(refcon!).takeUnretainedValue()
+                swiftInstance.keyboardId = Int(keyboardId)
+                if(swiftInstance.keyboardId != nil && !swiftInstance.updatedKb) {
+                    print("entered")
+                
+                    swiftInstance.appDelegate!.databaseManagement.addKeyboard(id: swiftInstance.keyboardId!, allKeys: swiftInstance.allKeys)
+                    swiftInstance.allKeys = swiftInstance.appDelegate!.databaseManagement.getSavedKeyData(kbId: swiftInstance.keyboardId!, allKeys: swiftInstance.allKeys)
+
+
+                    swiftInstance.updatedKb = true
+                }
+                
+            
+
+            
                 
                 if(key == nil) {
                     return Unmanaged.passUnretained(event);
@@ -151,18 +172,19 @@ class Model : ObservableObject {
         let maskRelease: CGEventMask = (1 << CGEventType.keyUp.rawValue);
 
         
-        var selfPtr: Unmanaged<Model>! = Unmanaged.passRetained(self)
+        var selfPtr: Unmanaged<ViewModel>! = Unmanaged.passRetained(self)
             
         //event tap for key press
         let keyPress: CFMachPort = CGEvent.tapCreate(tap: CGEventTapLocation.cgSessionEventTap, place: CGEventTapPlacement.headInsertEventTap, options: CGEventTapOptions.defaultTap, eventsOfInterest: maskPress,
                                   callback: callBackPress,
                                                      userInfo: selfPtr.toOpaque())!;
         
+        
         //event tap for key release
         let keyRelease: CFMachPort = CGEvent.tapCreate(tap: CGEventTapLocation.cgSessionEventTap, place: CGEventTapPlacement.headInsertEventTap, options: CGEventTapOptions.defaultTap, eventsOfInterest: maskRelease,
                                   callback: callBackRelease,
                                   userInfo: selfPtr.toOpaque())!;
-
+        
     
         let runLoopSourceRelease: CFRunLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, keyRelease, 0)
         let runLoopSourcePress: CFRunLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, keyPress, 0)
@@ -170,7 +192,10 @@ class Model : ObservableObject {
         CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSourceRelease, CFRunLoopMode.commonModes);
         CGEvent.tapEnable(tap: keyPress, enable: true)
         CGEvent.tapEnable(tap: keyRelease, enable: true)
+        
         CFRunLoopRun();
+        
+    
     }
     
     //check for accessibility priveledges
@@ -188,6 +213,13 @@ class Model : ObservableObject {
             }
         }
     }
+    public func updateKeyInfo() {
+        print(self.keyboardId)
+        appDelegate?.databaseManagement.updateKeyData(kbId: self.keyboardId!, allKeys: self.allKeys)
+    }
 }
+
+
+
 
 

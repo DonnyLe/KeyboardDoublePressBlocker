@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var model: Model;
+    @EnvironmentObject var viewModel: ViewModel;
     @State private var delay: Double = 0.1
-    @State private var formatter: NumberFormatter = NumberFormatter()
+    @EnvironmentObject var data: DatabaseManagement;
+    @State var appDel: AppDelegate;
+ 
     
     
     
@@ -21,8 +23,10 @@ struct ContentView: View {
 
             var started: Bool = false;
             Keyboard().onTapGesture {
-                if(model.checkAccess() && !started) {
-                    model.start();
+                
+                
+                if(viewModel.checkAccess() && !started) {
+                    viewModel.start(appDelegate: appDel);
                     started = true;
                 }
                 else {
@@ -38,7 +42,7 @@ struct ContentView: View {
                     value: $delay,
                     in: 0...1,
                     onEditingChanged: {editing in
-                        model.changeDelay(delay: delay)
+                        viewModel.changeDelay(delay: delay)
                         
                     }
                 )
@@ -48,8 +52,8 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
+//#Preview {
+//    ContentView()
+//}
 
 

@@ -12,11 +12,11 @@ import SwiftUI;
     var pressedTimeStamp: Double;
     var releasedTimeStamp: Double;
     var keyName: String;
-    var doublePresses: Double;
-    var doubleReleases: Double;
+    var doublePresses: Int;
+    var doubleReleases: Int;
 
-    var presses: Double;
-    var releases: Double;
+    var presses: Int;
+    var releases: Int;
     var id = UUID()
     var delay: Double = 0.1;
 
@@ -63,11 +63,10 @@ import SwiftUI;
     
     func getPercentageOfDoublePress() -> Double {
         if(self.presses > 0) {
-            return self.doublePresses / self.presses;
+            return Double (self.doublePresses) / Double( self.presses);
         }
         return 0;
     }
-    
     
     
 }
