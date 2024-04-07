@@ -86,7 +86,22 @@ class ViewModel : ObservableObject {
                     124: Keys("▸")]]
     }
     
-    
+    func resetKBData() {
+        for keyRow in allKeys {
+            for keyPair in keyRow {
+                keyPair.value.presses = 0;
+                keyPair.value.doublePresses = 0;
+                keyPair.value.doubleReleases = 0;
+                keyPair.value.releasedTimeStamp = 0;
+                keyPair.value.pressedTimeStamp = 0;
+                keyPair.value.pressedTimeStamp = 0;
+
+
+                
+            }
+        }
+        
+    }
     func start (appDelegate: AppDelegate){
         self.appDelegate = appDelegate
         appDelegate.addViewModelObserver(viewModel: self)
@@ -139,7 +154,7 @@ class ViewModel : ObservableObject {
                         key = nil;
                     }
                 }
-                var keyboardId: CGEventSourceKeyboardType = CGEventSource(event: event)!.keyboardType
+                let keyboardId: CGEventSourceKeyboardType = CGEventSource(event: event)!.keyboardType
                 let swiftInstance = Unmanaged<ViewModel>.fromOpaque(refcon!).takeUnretainedValue()
                 swiftInstance.keyboardId = Int(keyboardId)
                 if(swiftInstance.keyboardId != nil && !swiftInstance.updatedKb) {
@@ -172,7 +187,7 @@ class ViewModel : ObservableObject {
         let maskRelease: CGEventMask = (1 << CGEventType.keyUp.rawValue);
 
         
-        var selfPtr: Unmanaged<ViewModel>! = Unmanaged.passRetained(self)
+        let selfPtr: Unmanaged<ViewModel>! = Unmanaged.passRetained(self)
             
         //event tap for key press
         let keyPress: CFMachPort = CGEvent.tapCreate(tap: CGEventTapLocation.cgSessionEventTap, place: CGEventTapPlacement.headInsertEventTap, options: CGEventTapOptions.defaultTap, eventsOfInterest: maskPress,
@@ -214,12 +229,11 @@ class ViewModel : ObservableObject {
         }
     }
     public func updateKeyInfo() {
-        print(self.keyboardId)
-        appDelegate?.databaseManagement.updateKeyData(kbId: self.keyboardId!, allKeys: self.allKeys)
+        if(self.keyboardId != nil) {
+            appDelegate?.databaseManagement.updateKeyData(kbId: self.keyboardId!, allKeys: self.allKeys)
+        }
     }
 }
-
-
 
 
 

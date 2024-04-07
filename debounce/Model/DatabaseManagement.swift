@@ -69,8 +69,8 @@ class DatabaseManagement: ObservableObject{
         do {
             for keyRow in allKeys {
                 for aKey in keyRow {
-                        var newKey: Keys = aKey.value
-                        var oldKey = filteredTable.filter(keyId == aKey.key)
+                    let newKey: Keys = aKey.value
+                    let oldKey = filteredTable.filter(keyId == aKey.key)
                     try db!.run(oldKey.update(presses <- newKey.presses, releases <- newKey.releases, doublePresses <- newKey.doublePresses, doubleReleases <- newKey.doubleReleases))
                             
                     }
@@ -95,10 +95,10 @@ class DatabaseManagement: ObservableObject{
         let filteredTable = keys.filter(keyboardId == kbId)
         do {
             for tableKey in try db!.prepare(filteredTable) {
-                var keyId = tableKey[self.keyId]
+                let keyId = tableKey[self.keyId]
                 for keyRow in allKeys {
                     if(keyRow.containsKey(keyId)) {
-                        var key: Keys = keyRow.value(forKey: keyId)!
+                        let key: Keys = keyRow.value(forKey: keyId)!
                         key.doublePresses = tableKey[self.doublePresses];
                         key.doubleReleases = tableKey[self.doubleReleases];
                         key.presses = tableKey[self.presses];

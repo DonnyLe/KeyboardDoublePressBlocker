@@ -11,20 +11,31 @@ import Cocoa
 @main
 struct debounceApp: App {
 
-    
-    
+    @Environment(\.openWindow) private var openWindow
+
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var viewModel: ViewModel = ViewModel();
     var body: some Scene {
-        MenuBarExtra("UtilityApp", systemImage: "hammer") {
+        
+        
+        WindowGroup(id: "keyboard-view") {
+            ContentView(appDelegate: appDelegate).environmentObject(viewModel).task { if(viewModel.checkAccess()) {
+                viewModel.start(appDelegate: appDelegate);
+            }
+                else {
+                    print("need access")
+                }
+                
+            }
+        }
+        MenuBarExtra("DebounceApp", systemImage: "hammer") {
             KeyboardViewButton()
             Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }
-        }
-        
-        WindowGroup(id: "keyboard-view") {
-            ContentView(appDel: appDelegate).environmentObject(viewModel)
+            Button("Reset") {
+                viewModel.resetKBData()
+            }
         }
                 
     }
@@ -34,8 +45,9 @@ struct debounceApp: App {
 struct KeyboardViewButton: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
-    @State var showWindow: Bool = false;
-
+    @State var showWindow: Bool = true;
+     
+    
 
     var body: some View {
         Button("Settings") {

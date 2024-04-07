@@ -11,31 +11,18 @@ struct ContentView: View {
     @EnvironmentObject var viewModel: ViewModel;
     @State private var delay: Double = 0.1
     @EnvironmentObject var data: DatabaseManagement;
-    @State var appDel: AppDelegate;
+    var appDelegate: AppDelegate;
  
     
     
     
     var body: some View {
-        
-        VStack {
-            
 
-            var started: Bool = false;
-            Keyboard().onTapGesture {
-                
-                
-                if(viewModel.checkAccess() && !started) {
-                    viewModel.start(appDelegate: appDel);
-                    started = true;
-                }
-                else {
-                    print("need access")
-                }
-            }
+        VStack {
+            Keyboard()
             HStack {
             
-                var strDelay: String = String((floor(delay * 100) / 100));
+                let strDelay: String = String((floor(delay * 100) / 100));
                 Text("Debounce Delay: " + strDelay)
                 
                 Slider (
@@ -52,8 +39,5 @@ struct ContentView: View {
     }
 }
 
-//#Preview {
-//    ContentView()
-//}
 
 
