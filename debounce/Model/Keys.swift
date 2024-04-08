@@ -44,17 +44,12 @@ import SwiftUI;
 //        print("Prev Time: \(self.pressedTimeStamp)");
 //              print("Curr Time: \(time)");
         self.presses += 1;
+        if(self.releasedTimeStamp < self.pressedTimeStamp) {
+//            print("entered")
+            return false
+        }
         if((time - self.pressedTimeStamp) < self.delay) {
             self.doublePresses += 1;
-            return true;
-        } else {
-            return false;
-        }
-    }
-    func isDoubleRelease(time: Double) -> Bool {
-        self.releases += 1;
-        if((time - self.releasedTimeStamp) < 0.1) {
-            self.doubleReleases += 1;
             return true;
         } else {
             return false;

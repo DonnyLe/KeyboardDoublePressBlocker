@@ -12,22 +12,21 @@ import Cocoa
 struct debounceApp: App {
 
     @Environment(\.openWindow) private var openWindow
-
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject var viewModel: ViewModel = ViewModel();
+    @State var started: Bool = false;
     var body: some Scene {
         
-        
         WindowGroup(id: "keyboard-view") {
-            ContentView(appDelegate: appDelegate).environmentObject(viewModel).task { if(viewModel.checkAccess()) {
+            ContentView(appDelegate: appDelegate).environmentObject(viewModel).task { if(viewModel.checkAccess() && !started) {
                 viewModel.start(appDelegate: appDelegate);
+                started = true;
             }
                 else {
                     print("need access")
                 }
                 
-            }
-        }
+            }}
         MenuBarExtra("DebounceApp", systemImage: "hammer") {
             KeyboardViewButton()
             Button("Quit") {

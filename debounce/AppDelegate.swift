@@ -6,7 +6,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var viewModel: ViewModel?
     override init() {
         databaseManagement = DatabaseManagement()
-        
         super.init()
 
     }

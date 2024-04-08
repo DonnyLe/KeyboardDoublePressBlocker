@@ -142,7 +142,7 @@ class ViewModel : ObservableObject {
             //is a C function, cannot use 'self'. Must have a self pointer to Model class
             if let ptr = refcon {
                 let listener = Unmanaged<ViewModel>.fromOpaque(ptr).takeUnretainedValue()
-                print("Key Release: \(event.getIntegerValueField(CGEventField.keyboardEventKeycode)), Event TimeStamp: \(Double(event.timestamp) * pow(10, -9))");
+                //print("Key Release: \(event.getIntegerValueField(CGEventField.keyboardEventKeycode)), Event TimeStamp: \(Double(event.timestamp) * pow(10, -9))");
                 let keyCode: Int = Int(truncatingIfNeeded: event.getIntegerValueField(CGEventField.keyboardEventKeycode))
                 var key: Keys?;
                 for keyRow in listener.allKeys  {
@@ -158,7 +158,7 @@ class ViewModel : ObservableObject {
                 let swiftInstance = Unmanaged<ViewModel>.fromOpaque(refcon!).takeUnretainedValue()
                 swiftInstance.keyboardId = Int(keyboardId)
                 if(swiftInstance.keyboardId != nil && !swiftInstance.updatedKb) {
-                    print("entered")
+                    //print("entered")
                 
                     swiftInstance.appDelegate!.databaseManagement.addKeyboard(id: swiftInstance.keyboardId!, allKeys: swiftInstance.allKeys)
                     swiftInstance.allKeys = swiftInstance.appDelegate!.databaseManagement.getSavedKeyData(kbId: swiftInstance.keyboardId!, allKeys: swiftInstance.allKeys)
@@ -174,9 +174,7 @@ class ViewModel : ObservableObject {
                 if(key == nil) {
                     return Unmanaged.passUnretained(event);
                 }
-                if(key?.isDoubleRelease(time: Double(event.timestamp) * pow(10, -9)) == true) {
-                    return nil;
-                }
+                
                 key?.setReleasedTimeStamp(time: (Double(event.timestamp) * pow(10, -9)))
                 return Unmanaged.passUnretained(event);
             }
